@@ -33,6 +33,7 @@ func main() {
 	c := commands{registeredCommands: make(map[string]func(*state, command) error)}
 	c.register("login", handlerLogin)
 	c.register("register", handlerRegister)
+	c.register("reset", handlerReset)
 	if len(os.Args) < 2 {
 		log.Fatalf("usage: cli <command> [args...]")
 	}
