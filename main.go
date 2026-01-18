@@ -1,33 +1,46 @@
 package main
 
 import (
-	"fmt"
+	"database/sql"
+	"log"
 	"os"
 
+	_ "github.com/lib/pq"
 	"github.com/zombfeed/GoBlogAggregator/internal/config"
+	"github.com/zombfeed/GoBlogAggregator/internal/database"
 )
 
+const dbURL = "postgres://postgres:postgres@localhost:5432/gator"
+
 type state struct {
+	db     *database.Queries
 	config *config.Config
 }
 
 func main() {
 	cfg, err := config.Read()
 	if err != nil {
-		return
+		log.Fatalf("error reading config: %v", err)
 	}
+	db, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		log.Fatalf("error connecing to db %v", err)
+	}
+	defer db.Close()
 
-	s := state{&cfg}
+	dbQueries := database.New(db)
+	s := state{dbQueries, &cfg}
 	c := commands{registeredCommands: make(map[string]func(*state, command) error)}
 	c.register("login", handlerLogin)
-
+	c.register("register", handlerRegister)
 	if len(os.Args) < 2 {
-		fmt.Println("error: no arguments given ")
-		os.Exit(1)
+		log.Fatalf("usage: cli <command> [args...]")
 	}
-	cmd := command{Name: os.Args[1], Args: os.Args[2:]}
+	cmd := command{
+		Name: os.Args[1],
+		Args: os.Args[2:],
+	}
 	if err := c.run(&s, cmd); err != nil {
-		fmt.Println("error:", err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 }
