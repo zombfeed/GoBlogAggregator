@@ -9,12 +9,7 @@ import (
 	"github.com/zombfeed/GoBlogAggregator/internal/database"
 )
 
-func handlerAddFeed(s *state, cmd command) error {
-	user, err := s.db.GetUser(context.Background(), s.config.CurrentUserName)
-	if err != nil {
-		return err
-	}
-
+func handlerAddFeed(s *state, cmd command, user database.User) error {
 	if len(cmd.Args) != 2 {
 		return fmt.Errorf("usage: %s <feed name> <url>", cmd.Name)
 	}
