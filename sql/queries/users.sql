@@ -12,6 +12,9 @@ RETURNING *;
 SELECT * from users
 WHERE name=$1;
 
+-- name: GetUserByID :one
+SELECT * from users WHERE id=$1;
+
 -- name: GetUsers :many
 SELECT * from users;
 
