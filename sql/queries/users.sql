@@ -16,4 +16,4 @@ WHERE name=$1;
 SELECT * from users;
 
 -- name: DeleteUsers :exec
-TRUNCATE TABLE users;
+DELETE FROM users;
